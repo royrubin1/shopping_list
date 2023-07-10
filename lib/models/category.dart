@@ -17,6 +17,13 @@ class Category {
   const Category(this.title, this.color);
   final String title;
   final Color color;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'color': color.value.toRadixString(16),
+    };
+  }
 }
 
 /*
