@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:shopping_list/data/categories.dart';
+import 'package:shopping_list/models/grocery_item.dart';
 import '../models/category.dart';
 
 class NewItem extends StatefulWidget {
@@ -19,7 +20,7 @@ class NewItem extends StatefulWidget {
 class _NewItemState extends State<NewItem> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
-  var _enteredQuantatiy = 1;
+  var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.vegetables]!;
 
   void _saveItem() async {
@@ -34,20 +35,23 @@ class _NewItemState extends State<NewItem> {
         body: json.encode(
           {
             'name': _enteredName,
-            'quantity': _enteredQuantatiy,
+            'quantity': _enteredQuantity,
             'category': _selectedCategory.toJson(),
           },
         ),
       );
 
-      print(response.body);
-      print(response.statusCode);
+      final Map<String, dynamic> resData = json.decode(response.body);
 
       if (!context.mounted) {
         return;
       }
 
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(GroceryItem(
+          id: resData['name'],
+          name: _enteredName,
+          quantity: _enteredQuantity,
+          category: _selectedCategory));
     }
   }
 
@@ -101,7 +105,7 @@ class _NewItemState extends State<NewItem> {
                         return null;
                       },
                       onSaved: (newValue) {
-                        _enteredQuantatiy = int.parse(newValue!);
+                        _enteredQuantity = int.parse(newValue!);
                       },
                     ),
                   ),
