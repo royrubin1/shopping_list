@@ -56,7 +56,7 @@ class _GroceryListState extends State<GroceryList> {
         _isLoading = false;
       });
     } catch (error) {
-      // Nothing
+      // Error handling code should be here
     }
   }
 
