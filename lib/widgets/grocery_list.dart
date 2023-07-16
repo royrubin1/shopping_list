@@ -26,34 +26,38 @@ class _GroceryListState extends State<GroceryList> {
     final url = Uri.https(
         'flutter-prep-a8b73-default-rtdb.europe-west1.firebasedatabase.app',
         'shopping-list.json');
-    final response = await http.get(url);
 
-    if (response.body == 'null') {
+    try {
+      final response = await http.get(url);
+      if (response.body == 'null') {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final Map<String, dynamic> listData = json.decode(response.body);
+      final List<GroceryItem> loadedItems = [];
+      for (final item in listData.entries) {
+        final category = categories.entries
+            .firstWhere((catItem) =>
+                catItem.value.title == item.value['category']['title'])
+            .value;
+        loadedItems.add(
+          GroceryItem(
+              id: item.key,
+              name: item.value['name'],
+              quantity: item.value['quantity'],
+              category: category),
+        );
+      }
       setState(() {
+        _groceryItems = loadedItems;
         _isLoading = false;
       });
-      return;
+    } catch (error) {
+      // Nothing
     }
-
-    final Map<String, dynamic> listData = json.decode(response.body);
-    final List<GroceryItem> loadedItems = [];
-    for (final item in listData.entries) {
-      final category = categories.entries
-          .firstWhere((catItem) =>
-              catItem.value.title == item.value['category']['title'])
-          .value;
-      loadedItems.add(
-        GroceryItem(
-            id: item.key,
-            name: item.value['name'],
-            quantity: item.value['quantity'],
-            category: category),
-      );
-    }
-    setState(() {
-      _groceryItems = loadedItems;
-      _isLoading = false;
-    });
   }
 
   void _addItem() async {
